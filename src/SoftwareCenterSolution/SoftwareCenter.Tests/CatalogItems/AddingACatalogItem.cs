@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using SoftwareCenter.Api.CatalogItems;
+using FluentValidation.TestHelper;
 
 namespace SoftwareCenter.Tests.CatalogItems;
 
@@ -68,6 +69,80 @@ public  class AddingACatalogItem
     }
 }
 
+public class CatalogItemEntityValidationTests
+{
+    [Theory]
+    [Trait("Category", "UnitTest")]
+    [MemberData(nameof(InvalidCatalogItem))]
+    public void InvalidCatalogItemEntityValidations(CatalogItemCreateRequest catalogItem)
+    {
+        var validator = new CatalogItemEntityValidator();
+        var validations = validator.TestValidate(catalogItem);
+        Assert.False(validations.IsValid);
+    }
+
+    [Theory]
+    [Trait("Category", "UnitTest")]
+    [MemberData(nameof(ValidCatalogItem))]
+    public void ValidShowValidations(CatalogItemCreateRequest catalogItem)
+    {
+        var validator = new CatalogItemEntityValidator();
+        var validations = validator.TestValidate(catalogItem);
+        Assert.True(validations.IsValid);
+    }
+
+    private static readonly int DescriptionMinLength = 10;
+    private static readonly int DescriptionMaxLength = 500;
+    private static readonly int NameMinLength = 3;
+    private static readonly int NameMaxLength = 100;
+
+    public static IEnumerable<object[]> InvalidCatalogItem() =>
+        new[]
+        {
+            new object[] { new CatalogItemCreateRequest() },
+            new object[]
+            {
+                new CatalogItemCreateRequest()
+                {
+                    Name = new string('x', NameMinLength - 1),
+                    Description = new string('x', DescriptionMinLength),
+                    Version = ""
+                }
+            },
+            new object[]
+            {
+                new CatalogItemCreateRequest()
+                {
+                    Name = new string('X', NameMaxLength + 1),
+                    Description = new string('X', DescriptionMaxLength + 1),
+                    Version = ""
+                }
+            },
+        };
+
+    public static IEnumerable<object[]> ValidCatalogItem() =>
+        new[]
+        {
+            new object[]
+            {
+                new CatalogItemCreateRequest()
+                {
+                    Name = new string('X', NameMaxLength),
+                    Description = new string('X', DescriptionMaxLength),
+                    Version = "1.0"
+                }
+            },
+            new object[]
+            {
+                new CatalogItemCreateRequest()
+                {
+                    Name = new string('X', NameMinLength),
+                    Description = new string('X', DescriptionMinLength),
+                    Version = "v1.0.1"
+                }
+            },
+        };
+}
 
 //public class StubbedReturnsNoVendorLookup : ILookupVendors
 //{
