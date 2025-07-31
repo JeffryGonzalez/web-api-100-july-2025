@@ -38,7 +38,7 @@ public class Controller(IDocumentSession session) : ControllerBase
 
         // Mapping Code (copy from one object to another)
         
-        var response = new CreateVendorResponse(
+        var response = new VendorItemResponse(
             Guid.NewGuid(),
             User.Identity!.Name!,
             request.Name,
@@ -48,7 +48,7 @@ public class Controller(IDocumentSession session) : ControllerBase
         session.Store(response); // I would to add a vendor
         //                         // I want to update this other table, maybe 
         await session.SaveChangesAsync();
-        return Ok(response);
+        return Ok(response.MapToDto());
     }
 
 
@@ -57,7 +57,7 @@ public class Controller(IDocumentSession session) : ControllerBase
     {
         // look that thing up in the database.
         var response = await session
-            .Query<CreateVendorResponse>()
+            .Query<VendorItemResponse>()
             .Where(v => v.Id == id)
             .SingleOrDefaultAsync();
 
@@ -67,14 +67,14 @@ public class Controller(IDocumentSession session) : ControllerBase
         }
         else
         {
-            return Ok(response);
+            return Ok(response.MapToDto());
         }
     }
 
     [HttpGet("/vendors")]
     public async Task<ActionResult> GetAllVendorsAsync(CancellationToken token)
     {
-        var vendors = await session.Query<CreateVendorResponse>().ToListAsync();
+        var vendors = await session.Query<VendorItemResponse>().ToListAsync();
 
         return Ok(vendors);
     }

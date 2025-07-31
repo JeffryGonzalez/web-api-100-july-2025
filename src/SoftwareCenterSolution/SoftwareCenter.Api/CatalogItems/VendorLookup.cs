@@ -14,12 +14,12 @@ public class VendorLookup(IDocumentSession session) : ILookupVendors
         return item is not null;
     }
 
-    public async Task<CreateVendorResponse?> GetVendorByIdAsync(Guid id) => await QueryVendorByIdAsync(id);
+    public async Task<VendorItemResponse?> GetVendorByIdAsync(Guid id) => await QueryVendorByIdAsync(id);
     
 
-    private async Task<CreateVendorResponse?> QueryVendorByIdAsync(Guid id)
+    private async Task<VendorItemResponse?> QueryVendorByIdAsync(Guid id)
     {
-        return await session.Query<CreateVendorResponse>()
+        return await session.Query<VendorItemResponse>()
                             .Where(v => v.Id == id)
                             .SingleOrDefaultAsync();
     }

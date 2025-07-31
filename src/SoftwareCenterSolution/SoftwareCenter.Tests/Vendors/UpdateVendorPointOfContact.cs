@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Alba;
 using Alba.Security;
 using SoftwareCenter.Api.Vendors;
+using static SoftwareCenter.Api.Vendors.Dtos;
 
 namespace SoftwareCenter.Tests.Vendors
 {
@@ -139,7 +140,7 @@ namespace SoftwareCenter.Tests.Vendors
                 api.StatusCodeShouldBeOk();
             });
 
-            var postBodyResponse = await postResponse.ReadAsJsonAsync<CreateVendorResponse>();
+            var postBodyResponse = await postResponse.ReadAsJsonAsync<VendorItemResponseDto>();
 
             Assert.NotNull(postBodyResponse);
 
@@ -168,7 +169,7 @@ namespace SoftwareCenter.Tests.Vendors
                 api.StatusCodeShouldBeOk();
             });
 
-            var getVendorByIdBodyResponse = await getVendorByIdResponse.ReadAsJsonAsync<CreateVendorResponse>();
+            var getVendorByIdBodyResponse = await getVendorByIdResponse.ReadAsJsonAsync<VendorItemResponseDto>();
             Assert.NotNull(getVendorByIdBodyResponse);
 
             Assert.Equal(updatedPointOfContact, getVendorByIdBodyResponse.PointOfContact);

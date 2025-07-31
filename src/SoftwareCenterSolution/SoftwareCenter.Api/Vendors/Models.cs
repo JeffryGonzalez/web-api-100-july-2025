@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using static SoftwareCenter.Api.Vendors.Dtos;
 
 namespace SoftwareCenter.Api.Vendors
 {
@@ -47,9 +48,15 @@ namespace SoftwareCenter.Api.Vendors
         }
     }
 
-    public record CreateVendorResponse(
+    public record VendorItemResponse(
         Guid Id,
         string AddedBy,
         string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
-        );
+    )
+    {
+        public VendorItemResponseDto MapToDto()
+        {
+            return new VendorItemResponseDto(Id, Name, Url, PointOfContact);
+        }
+    };
 }

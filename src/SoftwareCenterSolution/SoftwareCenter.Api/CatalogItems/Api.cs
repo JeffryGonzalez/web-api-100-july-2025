@@ -98,5 +98,5 @@ public class CatalogItemEntity
 public interface ILookupVendors
 {
     Task<bool> CheckIfVendorExistsAsync(Guid id);
-    Task<CreateVendorResponse?> GetVendorByIdAsync(Guid id);
+    Task<VendorItemResponse?> GetVendorByIdAsync(Guid id);
 }
