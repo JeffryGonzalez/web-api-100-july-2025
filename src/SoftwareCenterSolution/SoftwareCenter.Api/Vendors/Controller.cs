@@ -51,6 +51,47 @@ public class Controller(IDocumentSession session) : ControllerBase
         return Ok(response);
     }
 
+    [HttpPut("/vendors/{id:guid}/point-of-contact")]
+    [Authorize(Policy = "CanUpdateVendor")]
+    public async Task<ActionResult> UpdateAVendorAsync(
+        Guid id,
+        [FromBody] VendorPointOfContact request,
+        [FromServices] IValidator<VendorPointOfContact> validator,
+        CancellationToken token)
+    {
+        //if(!ModelState.IsValid)
+        // {
+        //     return BadRequest(ModelState);
+        // }
+
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+        var vendorToUpdate = await session
+            .Query<CreateVendorResponse>()
+            .Where(v => v.Id == id)
+            .SingleOrDefaultAsync();
+
+        if (vendorToUpdate is null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            var updatedVendor = vendorToUpdate with { PointOfContact  = request };
+            session.Store(updatedVendor);
+            await session.SaveChangesAsync();
+            return NoContent();
+        }
+        //session.Store(response); // I would to add a vendor
+        ////                         // I want to update this other table, maybe 
+        //await session.SaveChangesAsync();
+        //return Ok(response);
+    }
+
 
     [HttpGet("/vendors/{id:guid}")]
     public async Task<ActionResult> GetVendorByIdAsync(Guid id, CancellationToken token)
@@ -97,7 +138,7 @@ public record CreateVendorRequest
 
     public string Name { get; init; } = string.Empty;
     public string Url { get; init; } = string.Empty;
-    public CreateVendorPointOfContactRequest PointOfContact { get; init; } = new();
+    public VendorPointOfContact PointOfContact { get; set; } = new();
 }
 
 public class CreateVendorRequestValidator : AbstractValidator<CreateVendorRequest>
@@ -110,15 +151,25 @@ public class CreateVendorRequestValidator : AbstractValidator<CreateVendorReques
     }
 }
 
-public record CreateVendorPointOfContactRequest
+public class VendorPointOfContactValidator : AbstractValidator<VendorPointOfContact>
 {
-    public string Name { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Email { get; init; } = string.Empty;
+    public VendorPointOfContactValidator()
+    {
+        RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
+        RuleFor(v => v.Phone).NotEmpty();
+        RuleFor(v => v.Email).NotNull();
+    }
+}
+
+public record VendorPointOfContact
+{
+    public string Name { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 };
 
 public class CreateVendorPointOfContactRequestValidator :
-    AbstractValidator<CreateVendorPointOfContactRequest>
+    AbstractValidator<VendorPointOfContact>
 {
     public CreateVendorPointOfContactRequestValidator()
     {
@@ -130,5 +181,5 @@ public class CreateVendorPointOfContactRequestValidator :
 public record CreateVendorResponse(
     Guid Id,
     string AddedBy,
-    string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
+    string Name, string Url, VendorPointOfContact PointOfContact
     );

@@ -15,6 +15,11 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("CanAddVendor", pol =>
     pol.RequireRole("Manager");
     pol.RequireRole("SoftwareCenter");
 });
+builder.Services.AddAuthorizationBuilder().AddPolicy("CanUpdateVendor", pol =>
+{
+    pol.RequireRole("Manager");
+    pol.RequireRole("SoftwareCenter");
+});
 
 var connectionString = builder.Configuration.GetConnectionString("db") ??
     throw new Exception("Need a connection string");
@@ -28,7 +33,7 @@ builder.Services.AddMarten(config =>
 }).UseLightweightSessions();
 
 builder.Services.AddScoped<IValidator<CreateVendorRequest>, CreateVendorRequestValidator>();
-builder.Services.AddScoped<IValidator<CreateVendorPointOfContactRequest>, CreateVendorPointOfContactRequestValidator>();
+builder.Services.AddScoped<IValidator<VendorPointOfContact>, CreateVendorPointOfContactRequestValidator>();
 // it will give us a scoped service called IDocumentSession
 // if this was Entity framework, it would give us a "DbContext" object we can use.
 builder.Services.AddScoped<ILookupVendors, VendorLookup>();

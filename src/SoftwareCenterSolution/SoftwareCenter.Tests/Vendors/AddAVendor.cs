@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Alba;
 using Alba.Security;
+using Microsoft.AspNetCore.Http.HttpResults;
 using SoftwareCenter.Api.Vendors;
 
 namespace SoftwareCenter.Tests.Vendors;
@@ -22,7 +23,7 @@ public  class AddAVendor
         {
             Name = "Microsoft",
             Url = "https://www.microsoft.com",
-            PointOfContact = new CreateVendorPointOfContactRequest
+            PointOfContact = new VendorPointOfContact
             {
                 Name = "satya",
                 Email = "satya@microsoft.com",
@@ -45,7 +46,7 @@ public  class AddAVendor
         {
             Name = "Microsoft",
             Url = "https://www.microsoft.com",
-            PointOfContact = new CreateVendorPointOfContactRequest
+            PointOfContact = new VendorPointOfContact
             {
                 Name = "satya",
                 Email = "satya@microsoft.com",
@@ -76,7 +77,7 @@ public  class AddAVendor
             Name = "Microsoft",
             Url = "https://www.microsoft.com",
 
-            PointOfContact = new CreateVendorPointOfContactRequest
+            PointOfContact = new VendorPointOfContact
             {
                 Name = "satya",
                 Email = "satya@microsoft.com",
@@ -109,7 +110,31 @@ public  class AddAVendor
 
 
         Assert.Equal(postBodyResponse, getResponseBody);
-     
-       
+
+        var updatedContactInfo = new VendorPointOfContact()
+        {
+            Name = "NEW",
+            Phone = "8675309",
+            Email = "Jenny@test.com"
+        };
+        var putResponse = await host.Scenario(api =>
+        {
+            api.WithClaim(new Claim(ClaimTypes.Role, "SoftwareCenter"));
+            api.WithClaim(new Claim(ClaimTypes.Role, "Manager"));
+            api.Put.Json(updatedContactInfo).ToUrl($"/vendors/{postBodyResponse.Id}/point-of-contact");
+
+            api.StatusCodeShouldBe(204);
+        });
+
+        var getResponse2 = await host.Scenario(api =>
+        {
+            api.Get.Url($"/vendors/{postBodyResponse.Id}");
+            api.StatusCodeShouldBeOk();
+        });
+
+        var getResponseBody2 = await getResponse.ReadAsJsonAsync<CreateVendorResponse>();
+
+        Assert.NotNull(getResponseBody2);
+        Assert.Equal("8675309", getResponseBody2.PointOfContact.Phone);
     }
 }
