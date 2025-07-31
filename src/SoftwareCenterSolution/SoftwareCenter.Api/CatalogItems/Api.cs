@@ -1,4 +1,5 @@
-﻿using Marten;
+﻿using FluentValidation;
+using Marten;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -91,6 +92,16 @@ public class CatalogItemEntity
             Name = Name,
             Version = Version,
         };
+    }
+}
+
+public class CatalogItemEntityValidator : AbstractValidator<CatalogItemCreateRequest>
+{
+    public CatalogItemEntityValidator()
+    {
+        RuleFor(c => c.Name).NotEmpty().MinimumLength(3).MaximumLength(100);
+        RuleFor(c => c.Description).NotEmpty().MinimumLength(10).MaximumLength(500);
+        RuleFor(c => c.Version).NotEmpty();
     }
 }
 
