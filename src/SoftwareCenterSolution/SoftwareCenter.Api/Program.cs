@@ -2,6 +2,7 @@ using FluentValidation;
 using Marten;
 using SoftwareCenter.Api.CatalogItems;
 using SoftwareCenter.Api.Vendors;
+using static SoftwareCenter.Api.Vendors.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,12 @@ builder.Services.AddCatalogItems();
 
 builder.Services.AddAuthentication().AddJwtBearer();
 builder.Services.AddAuthorizationBuilder().AddPolicy("CanAddVendor", pol =>
+{
+    pol.RequireRole("Manager");
+    pol.RequireRole("SoftwareCenter");
+});
+
+builder.Services.AddAuthorizationBuilder().AddPolicy("CanUpdateVendor", pol =>
 {
     pol.RequireRole("Manager");
     pol.RequireRole("SoftwareCenter");

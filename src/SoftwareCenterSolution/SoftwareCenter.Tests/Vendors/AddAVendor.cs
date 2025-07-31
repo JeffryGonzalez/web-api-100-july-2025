@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Alba;
 using Alba.Security;
 using SoftwareCenter.Api.Vendors;
+using static SoftwareCenter.Api.Vendors.Models;
 
 namespace SoftwareCenter.Tests.Vendors;
 
@@ -92,7 +93,7 @@ public  class AddAVendor
             api.StatusCodeShouldBeOk();
         });
 
-        var postBodyResponse = await postResponse.ReadAsJsonAsync<CreateVendorResponse>();
+        var postBodyResponse = await postResponse.ReadAsJsonAsync<VendorResponseModel>();
 
         Assert.NotNull(postBodyResponse);
 
@@ -103,7 +104,7 @@ public  class AddAVendor
             api.StatusCodeShouldBeOk();
         });
 
-        var getResponseBody = await getResponse.ReadAsJsonAsync<CreateVendorResponse>();
+        var getResponseBody = await getResponse.ReadAsJsonAsync<VendorResponseModel>();
 
         Assert.NotNull(getResponseBody);
 
