@@ -1,4 +1,6 @@
-﻿using Marten;
+﻿using FluentValidation;
+using Marten;
+using SoftwareCenter.Api.Vendors;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -49,6 +51,7 @@ public record CatalogItemCreateRequest
 
     public  CatalogItemEntity MapToEntity(Guid vendorId)
     {
+        if (CreateCatalogItemRequestValidator())
         return new CatalogItemEntity
         {
 
@@ -59,6 +62,16 @@ public record CatalogItemCreateRequest
             Name = Name,
             Version = Version,
         };
+    }
+}
+
+public class CreateCatalogItemRequestValidator : AbstractValidator<CatalogItemCreateRequest>
+{
+    public CreateCatalogItemRequestValidator(string )
+    {
+        RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
+        RuleFor(v => v.Description).NotEmpty();
+        RuleFor(v => v.Version).NotNull();
     }
 }
 

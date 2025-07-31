@@ -9,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCatalogItems();
 
-builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+});
 builder.Services.AddAuthorizationBuilder().AddPolicy("CanAddVendor", pol =>
 {
     pol.RequireRole("Manager");
@@ -29,6 +32,7 @@ builder.Services.AddMarten(config =>
 
 builder.Services.AddScoped<IValidator<CreateVendorRequest>, CreateVendorRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateVendorPointOfContactRequest>, CreateVendorPointOfContactRequestValidator>();
+builder.Services.AddScoped<IValidator<CatalogItemCreateRequest>, CreateCatalogItemRequestValidator>();
 // it will give us a scoped service called IDocumentSession
 // if this was Entity framework, it would give us a "DbContext" object we can use.
 builder.Services.AddScoped<ILookupVendors, VendorLookup>();
