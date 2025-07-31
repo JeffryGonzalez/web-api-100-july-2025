@@ -1,6 +1,6 @@
 ﻿
 using Marten;
-using SoftwareCenter.Api.Vendors;
+using static SoftwareCenter.Api.Vendors.Models;
 
 namespace SoftwareCenter.Api.CatalogItems;
 

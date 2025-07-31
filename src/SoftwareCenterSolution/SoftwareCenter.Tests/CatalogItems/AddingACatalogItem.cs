@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using SoftwareCenter.Api.CatalogItems;
+using static SoftwareCenter.Api.CatalogItems.Models;
 
 namespace SoftwareCenter.Tests.CatalogItems;
 
