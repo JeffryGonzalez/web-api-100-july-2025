@@ -1,6 +1,7 @@
 using FluentValidation;
 using Marten;
 using SoftwareCenter.Api.CatalogItems;
+using SoftwareCenter.Api.Extensions;
 using SoftwareCenter.Api.Vendors;
 
 
@@ -10,11 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCatalogItems();
 
 builder.Services.AddAuthentication().AddJwtBearer();
-builder.Services.AddAuthorizationBuilder().AddPolicy("CanAddVendor", pol =>
-{
-    pol.RequireRole("Manager");
-    pol.RequireRole("SoftwareCenter");
-});
+builder.Services.AddAuthorizationBuilder().AddSoftwareCenterAuthPolicies();
 
 var connectionString = builder.Configuration.GetConnectionString("db") ??
     throw new Exception("Need a connection string");

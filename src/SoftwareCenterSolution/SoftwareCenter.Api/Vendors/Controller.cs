@@ -3,6 +3,7 @@ using FluentValidation;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SoftwareCenter.Api.CatalogItems;
 
 namespace SoftwareCenter.Api.Vendors;
 
@@ -79,6 +80,35 @@ public class Controller(IDocumentSession session) : ControllerBase
         return Ok(vendors);
     }
 
+    [HttpPut("/vendors/{id:guid}/point-of-contact")]
+    [Authorize(Policy = "CanUpdateVendorPointofContact")]
+    public async Task<ActionResult> UpdateVendorPointOfContactAsync(
+        [FromRoute] Guid id, 
+        [FromBody] CreateVendorPointOfContactRequest request, 
+        [FromServices] ILookupVendors vendorLookupService, 
+        [FromServices] IValidator<CreateVendorPointOfContactRequest> validator
+    )
+    {
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+        if (!await vendorLookupService.CheckIfVendorExistsAsync(id))
+        {
+            return NotFound();
+        }
+
+        var vendor = await vendorLookupService.GetVendorByIdAsync(id);
+        
+        var updatedVendorPointOfContact = vendor! with { PointOfContact =  request };
+
+        session.Update(updatedVendorPointOfContact);
+        await session.SaveChangesAsync();
+        return NoContent();
+    }
+
 }
 
 /*{
@@ -90,7 +120,6 @@ public class Controller(IDocumentSession session) : ControllerBase
         "email": "satya@microsoft.com"
     }
 }*/
-
 
 public record CreateVendorRequest
 {

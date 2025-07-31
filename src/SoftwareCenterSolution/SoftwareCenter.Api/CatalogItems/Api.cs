@@ -1,4 +1,5 @@
 ﻿using Marten;
+using SoftwareCenter.Api.Vendors;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -97,4 +98,5 @@ public class CatalogItemEntity
 public interface ILookupVendors
 {
     Task<bool> CheckIfVendorExistsAsync(Guid id);
+    Task<CreateVendorResponse?> GetVendorByIdAsync(Guid id);
 }
