@@ -1,4 +1,6 @@
-﻿using Marten;
+﻿using FluentValidation;
+using Marten;
+using SoftwareCenter.Api.Vendors;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -11,8 +13,20 @@ public static class Api
             Guid id, 
             CatalogItemCreateRequest request, 
             IDocumentSession session,
-            ILookupVendors vendorLookups) =>
+            ILookupVendors vendorLookups,
+            IValidator<CatalogItemCreateRequest> validator) =>
         {
+            //Make sure it is valid, otherwise sending a 400
+            var validationResults = await validator.ValidateAsync(request);
+            if (!validationResults.IsValid)
+            {
+                {
+                    var errors = validationResults.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+                    return Results.ValidationProblem(errors.ToDictionary(e => e.PropertyName, e => new[] { e.ErrorMessage }));
+                }
+
+            }
+
             // validate the stuff - see the issue.
             // create the entity
             bool noSuchVendor = await vendorLookups.CheckIfVendorExistsAsync(id);
@@ -61,6 +75,28 @@ public record CatalogItemCreateRequest
         };
     }
 }
+
+
+public class CreateCatalogIemRequestValidator : AbstractValidator<CatalogItemCreateRequest>
+{
+    public CreateCatalogIemRequestValidator()
+    {
+        RuleFor(v => v.Name)
+            .NotEmpty().WithMessage("Name is required.")
+            .MinimumLength(3).WithMessage("Name must be at least 3 characters long.")
+            .MaximumLength(255).WithMessage("Name must not exceed 255 characters.");
+
+        RuleFor(v => v.Description)
+            .NotEmpty().WithMessage("Description is required.")
+            .MinimumLength(10).WithMessage("Description must be at least 10 characters.")
+            .MaximumLength(350).WithMessage("Description must not exceed 350 characters.");
+
+        RuleFor(v => v.Version)
+            .NotEmpty().WithMessage("Version is required.");
+
+    }
+}
+
 
 public record CatalogItemDetails
 {
