@@ -1,7 +1,7 @@
 @SoftwareCenter.Api_HostAddress = http://localhost:1337
 
 POST {{SoftwareCenter.Api_HostAddress}}/vendors
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InN1ZUBhb2wuY29tIiwic3ViIjoic3VlQGFvbC5jb20iLCJqdGkiOiI4ODI1ZDU5MCIsInJvbGUiOlsiU29mdHdhcmVDZW50ZXIiLCJNYW5hZ2VyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk3MzU1NSwiZXhwIjoxNzYxOTIyMzU1LCJpYXQiOjE3NTM5NzM1NTUsImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.ADnsGhBbgtO-WAnJzzjLwv0gPw-nPd25wPosleyCSsA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im1lZ0Bhb2wuY29tIiwic3ViIjoibWVnQGFvbC5jb20iLCJqdGkiOiI5MzBiNTE1MCIsInJvbGUiOlsiTWFuYWdlciIsIlNvZnR3YXJlQ2VudGVyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5Njk4OCwiZXhwIjoxNzYxOTQ1Nzg4LCJpYXQiOjE3NTM5OTY5ODksImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.PwUzT6YTgcFKiCwYsDi965MOt47oyP1u_2A8xWZdgM8
 Accept: application/json
 Content-type: application/json
 
@@ -23,7 +23,7 @@ GET {{SoftwareCenter.Api_HostAddress}}/vendors/e506c810-taco-salad
 
 ### 
 GET {{SoftwareCenter.Api_HostAddress}}/vendors/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBhb2wuY29tIiwic3ViIjoiYm9iQGFvbC5jb20iLCJqdGkiOiIxNmQyNWE2YiIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk3MzMyNiwiZXhwIjoxNzYxOTIyMTI2LCJpYXQiOjE3NTM5NzMzMjgsImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.zpEo-_nQeS_1ePR3n53BlHJ6QEZ8zlc6ed7CNOjcONw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBhb2wuY29tIiwic3ViIjoiYm9iQGFvbC5jb20iLCJqdGkiOiJjNGI1MDFiYiIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5MzI4NywiZXhwIjoxNzYxOTQyMDg3LCJpYXQiOjE3NTM5OTMyODgsImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.jHhQgcrhi82u1IFh2TDpMbzgJzzqn3Wye13bNdnDUFM
 
 
 ###
@@ -40,4 +40,16 @@ Content-Type: application/json
     "name": "Word",
     "description": "Do words and stuff",
     "version": "2025"
+}
+###
+
+
+PUT {{SoftwareCenter.Api_HostAddress}}/vendors/{id}/point-of-contact
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im1lZ0Bhb2wuY29tIiwic3ViIjoibWVnQGFvbC5jb20iLCJqdGkiOiI5MzBiNTE1MCIsInJvbGUiOlsiTWFuYWdlciIsIlNvZnR3YXJlQ2VudGVyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5Njk4OCwiZXhwIjoxNzYxOTQ1Nzg4LCJpYXQiOjE3NTM5OTY5ODksImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.PwUzT6YTgcFKiCwYsDi965MOt47oyP1u_2A8xWZdgM8
+Content-Type: application/json
+
+{
+      "name": "new name",
+      "phone": "new phone",
+      "email": "new email"
 }

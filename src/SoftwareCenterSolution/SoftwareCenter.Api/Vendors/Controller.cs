@@ -37,7 +37,7 @@ public class Controller(IDocumentSession session) : ControllerBase
         // we have to "save it" somewhere. 
 
         // Mapping Code (copy from one object to another)
-        
+
         var response = new CreateVendorResponse(
             Guid.NewGuid(),
             User.Identity!.Name!,
@@ -79,56 +79,87 @@ public class Controller(IDocumentSession session) : ControllerBase
         return Ok(vendors);
     }
 
-}
 
-/*{
-    "name": "Microsoft",
-    "url": "https://wwww.microsoft.com",
-    "pointOfContact": {
-        "name": "Satya",
-        "phone": "800 big-boss",
-        "email": "satya@microsoft.com"
-    }
-}*/
-
-
-public record CreateVendorRequest
-{
-
-    public string Name { get; init; } = string.Empty;
-    public string Url { get; init; } = string.Empty;
-    public CreateVendorPointOfContactRequest PointOfContact { get; init; } = new();
-}
-
-public class CreateVendorRequestValidator : AbstractValidator<CreateVendorRequest>
-{
-    public CreateVendorRequestValidator()
+    [HttpPut("/vendors/{id}/point-of-contact")]
+    [Authorize(Policy = "CanUpdateContactInfo")]
+    public async Task<ActionResult> UpdateContactInfoAsync(
+        Guid id,
+        [FromBody] CreateVendorRequest request,
+        [FromServices] IValidator<CreateVendorRequest> validator,
+        CancellationToken token)
     {
-        RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
-        RuleFor(v => v.Url).NotEmpty();
-        RuleFor(v => v.PointOfContact).NotNull();
+        //check if vendor exists
+        //find the existing contact
+        //change contact info
+
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+
+        var response = new CreateVendorResponse(
+            Guid.NewGuid(),
+            User.Identity!.Name!,
+            request.Name,
+            request.Url,
+            request.PointOfContact
+            );
+        session.Store(response);
+        await session.SaveChangesAsync();
+        return Ok(response);
     }
+
 }
 
-public record CreateVendorPointOfContactRequest
-{
-    public string Name { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Email { get; init; } = string.Empty;
-};
+  
 
-public class CreateVendorPointOfContactRequestValidator :
-    AbstractValidator<CreateVendorPointOfContactRequest>
-{
-    public CreateVendorPointOfContactRequestValidator()
+
+    public record CreateVendorRequest
     {
-        RuleFor(p => p.Name).NotEmpty();
 
+        public string Name { get; init; } = string.Empty;
+        public string Url { get; init; } = string.Empty;
+        public CreateVendorPointOfContactRequest PointOfContact { get; init; } = new();
     }
-}
 
-public record CreateVendorResponse(
-    Guid Id,
-    string AddedBy,
-    string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
-    );
+    public class CreateVendorRequestValidator : AbstractValidator<CreateVendorRequest>
+    {
+        public CreateVendorRequestValidator()
+        {
+            RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
+            RuleFor(v => v.Url).NotEmpty();
+            RuleFor(v => v.PointOfContact).NotNull();
+        }
+    }
+
+    public record CreateVendorPointOfContactRequest
+    {
+        public string Name { get; init; } = string.Empty;
+        public string Phone { get; init; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
+    };
+
+    public class CreateVendorPointOfContactRequestValidator :
+        AbstractValidator<CreateVendorPointOfContactRequest>
+    {
+        public CreateVendorPointOfContactRequestValidator()
+        {
+            RuleFor(p => p.Name).NotEmpty();
+
+        }
+    }
+
+    public record CreateVendorResponse(
+        Guid Id,
+        string AddedBy,
+        string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
+        )
+    { }
+
+    
+
+
+
+
