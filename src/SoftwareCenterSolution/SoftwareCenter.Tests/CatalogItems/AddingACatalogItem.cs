@@ -1,4 +1,5 @@
 ﻿
+using System.Net;
 using Alba;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,26 @@ namespace SoftwareCenter.Tests.CatalogItems;
 [Trait("Category", "UnitIntegration")]
 public  class AddingACatalogItem
 {
+    [Fact]
+    public async Task ReturnsBadRequest()
+    {
+        var catalogItem = new CatalogItemCreateRequest
+        {
+            Description = "Code Editor",
+            Name = "", // Blank name to trigger invalid response
+            Version = "1.28.0"
+        };
+
+        var host = await AlbaHost.For<Program>();
+
+        var fakeVendorId = Guid.NewGuid();
+        var postReponse = await host.Scenario(api =>
+        {
+            api.Post.Json(catalogItem).ToUrl($"/vendors/{fakeVendorId}/items");
+            api.StatusCodeShouldBe(HttpStatusCode.BadRequest);
+        });
+    }
+
     [Fact]
     public async Task CanAddACatalogItemWhenTheVendorExists()
     {

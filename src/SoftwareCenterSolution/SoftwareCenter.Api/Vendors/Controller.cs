@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using FluentValidation;
+﻿using FluentValidation;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SoftwareCenter.Api.CatalogItems;
 
 namespace SoftwareCenter.Api.Vendors;
 
@@ -38,7 +38,7 @@ public class Controller(IDocumentSession session) : ControllerBase
 
         // Mapping Code (copy from one object to another)
         
-        var response = new CreateVendorResponse(
+        var response = new VendorItemResponse(
             Guid.NewGuid(),
             User.Identity!.Name!,
             request.Name,
@@ -48,7 +48,7 @@ public class Controller(IDocumentSession session) : ControllerBase
         session.Store(response); // I would to add a vendor
         //                         // I want to update this other table, maybe 
         await session.SaveChangesAsync();
-        return Ok(response);
+        return Ok(response.MapToDto());
     }
 
 
@@ -57,7 +57,7 @@ public class Controller(IDocumentSession session) : ControllerBase
     {
         // look that thing up in the database.
         var response = await session
-            .Query<CreateVendorResponse>()
+            .Query<VendorItemResponse>()
             .Where(v => v.Id == id)
             .SingleOrDefaultAsync();
 
@@ -67,68 +67,45 @@ public class Controller(IDocumentSession session) : ControllerBase
         }
         else
         {
-            return Ok(response);
+            return Ok(response.MapToDto());
         }
     }
 
     [HttpGet("/vendors")]
     public async Task<ActionResult> GetAllVendorsAsync(CancellationToken token)
     {
-        var vendors = await session.Query<CreateVendorResponse>().ToListAsync();
+        var vendors = await session.Query<VendorItemResponse>().ToListAsync();
 
         return Ok(vendors);
     }
 
-}
-
-/*{
-    "name": "Microsoft",
-    "url": "https://wwww.microsoft.com",
-    "pointOfContact": {
-        "name": "Satya",
-        "phone": "800 big-boss",
-        "email": "satya@microsoft.com"
-    }
-}*/
-
-
-public record CreateVendorRequest
-{
-
-    public string Name { get; init; } = string.Empty;
-    public string Url { get; init; } = string.Empty;
-    public CreateVendorPointOfContactRequest PointOfContact { get; init; } = new();
-}
-
-public class CreateVendorRequestValidator : AbstractValidator<CreateVendorRequest>
-{
-    public CreateVendorRequestValidator()
+    [HttpPut("/vendors/{id:guid}/point-of-contact")]
+    [Authorize(Policy = "CanUpdateVendorPointofContact")]
+    public async Task<ActionResult> UpdateVendorPointOfContactAsync(
+        [FromRoute] Guid id, 
+        [FromBody] CreateVendorPointOfContactRequest request, 
+        [FromServices] ILookupVendors vendorLookupService, 
+        [FromServices] IValidator<CreateVendorPointOfContactRequest> validator
+    )
     {
-        RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
-        RuleFor(v => v.Url).NotEmpty();
-        RuleFor(v => v.PointOfContact).NotNull();
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+        if (!await vendorLookupService.CheckIfVendorExistsAsync(id))
+        {
+            return NotFound();
+        }
+
+        var vendor = await vendorLookupService.GetVendorByIdAsync(id);
+        
+        var updatedVendorPointOfContact = vendor! with { PointOfContact =  request };
+
+        session.Update(updatedVendorPointOfContact);
+        await session.SaveChangesAsync();
+        return NoContent();
     }
+
 }
-
-public record CreateVendorPointOfContactRequest
-{
-    public string Name { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Email { get; init; } = string.Empty;
-};
-
-public class CreateVendorPointOfContactRequestValidator :
-    AbstractValidator<CreateVendorPointOfContactRequest>
-{
-    public CreateVendorPointOfContactRequestValidator()
-    {
-        RuleFor(p => p.Name).NotEmpty();
-
-    }
-}
-
-public record CreateVendorResponse(
-    Guid Id,
-    string AddedBy,
-    string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
-    );
