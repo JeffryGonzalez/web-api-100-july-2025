@@ -1,7 +1,7 @@
 @SoftwareCenter.Api_HostAddress = http://localhost:1337
 
 POST {{SoftwareCenter.Api_HostAddress}}/vendors
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InN1ZUBhb2wuY29tIiwic3ViIjoic3VlQGFvbC5jb20iLCJqdGkiOiI4ODI1ZDU5MCIsInJvbGUiOlsiU29mdHdhcmVDZW50ZXIiLCJNYW5hZ2VyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk3MzU1NSwiZXhwIjoxNzYxOTIyMzU1LCJpYXQiOjE3NTM5NzM1NTUsImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.ADnsGhBbgtO-WAnJzzjLwv0gPw-nPd25wPosleyCSsA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBib2IuY29tIiwic3ViIjoiYm9iQGJvYi5jb20iLCJqdGkiOiI0ODA5MmFiMSIsInJvbGUiOlsiU29mdHdhcmVDZW50ZXIiLCJNYW5hZ2VyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5Njc0OCwiZXhwIjoxNzYxOTQ1NTQ4LCJpYXQiOjE3NTM5OTY3NDksImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.UAe8-vyZunXLO81FHxS3Ct_YoYgqQtihJansHRoZAy0
 Accept: application/json
 Content-type: application/json
 
@@ -18,12 +18,12 @@ Content-type: application/json
 
 ### 
 
-GET {{SoftwareCenter.Api_HostAddress}}/vendors/e506c810-taco-salad
+GET {{SoftwareCenter.Api_HostAddress}}/vendors/9849e3df-5ff4-478a-9223-c777b68156f1
 
 
 ### 
 GET {{SoftwareCenter.Api_HostAddress}}/vendors/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBhb2wuY29tIiwic3ViIjoiYm9iQGFvbC5jb20iLCJqdGkiOiIxNmQyNWE2YiIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk3MzMyNiwiZXhwIjoxNzYxOTIyMTI2LCJpYXQiOjE3NTM5NzMzMjgsImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.zpEo-_nQeS_1ePR3n53BlHJ6QEZ8zlc6ed7CNOjcONw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBib2IuY29tIiwic3ViIjoiYm9iQGJvYi5jb20iLCJqdGkiOiI0ODA5MmFiMSIsInJvbGUiOlsiU29mdHdhcmVDZW50ZXIiLCJNYW5hZ2VyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5Njc0OCwiZXhwIjoxNzYxOTQ1NTQ4LCJpYXQiOjE3NTM5OTY3NDksImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.UAe8-vyZunXLO81FHxS3Ct_YoYgqQtihJansHRoZAy0 
 
 
 ###
@@ -40,4 +40,15 @@ Content-Type: application/json
     "name": "Word",
     "description": "Do words and stuff",
     "version": "2025"
+}
+###
+
+PUT {{SoftwareCenter.Api_HostAddress}}/vendors/9849e3df-5ff4-478a-9223-c777b68156f1/point-of-contact
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImJvYkBib2IuY29tIiwic3ViIjoiYm9iQGJvYi5jb20iLCJqdGkiOiI0ODA5MmFiMSIsInJvbGUiOlsiU29mdHdhcmVDZW50ZXIiLCJNYW5hZ2VyIl0sImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsIm5iZiI6MTc1Mzk5Njc0OCwiZXhwIjoxNzYxOTQ1NTQ4LCJpYXQiOjE3NTM5OTY3NDksImlzcyI6ImRvdG5ldC11c2VyLWp3dHMifQ.UAe8-vyZunXLO81FHxS3Ct_YoYgqQtihJansHRoZAy0
+Content-Type: application/json
+
+{
+    "name": "Mike Pyke",
+    "email": "repitlemaster@sleep.com",
+    "phone": "555-444-6666"
 }
