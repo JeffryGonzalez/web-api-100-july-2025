@@ -1,4 +1,6 @@
-﻿using Marten;
+﻿using FluentValidation;
+using Marten;
+using SoftwareCenter.Api.Vendors;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -11,8 +13,16 @@ public static class Api
             Guid id, 
             CatalogItemCreateRequest request, 
             IDocumentSession session,
-            ILookupVendors vendorLookups) =>
+            ILookupVendors vendorLookups,
+            IValidator<CatalogItemCreateRequest> validator) =>
         {
+            //Make sure it is valid, otherwise sending a 400
+            var validationResults = await validator.ValidateAsync(request);
+            if (!validationResults.IsValid)
+            {
+                return Results.BadRequest();
+            }
+
             // validate the stuff - see the issue.
             // create the entity
             bool noSuchVendor = await vendorLookups.CheckIfVendorExistsAsync(id);
@@ -61,6 +71,20 @@ public record CatalogItemCreateRequest
         };
     }
 }
+
+
+public class CreateCatalogIemRequestValidator : AbstractValidator<CatalogItemCreateRequest>
+{
+    public CreateCatalogIemRequestValidator()
+    {
+        RuleFor(v => v.Name)
+            .NotEmpty()
+            .MinimumLength(3).MaximumLength(255);
+        RuleFor(v => v.Description).NotEmpty().MinimumLength(10).MaximumLength(350);
+        RuleFor(v => v.Version).NotNull();
+    }
+}
+
 
 public record CatalogItemDetails
 {

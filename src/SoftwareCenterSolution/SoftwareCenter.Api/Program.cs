@@ -29,6 +29,10 @@ builder.Services.AddMarten(config =>
 
 builder.Services.AddScoped<IValidator<CreateVendorRequest>, CreateVendorRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateVendorPointOfContactRequest>, CreateVendorPointOfContactRequestValidator>();
+
+//added for CatalogItemRequest validation:
+builder.Services.AddScoped<IValidator<CatalogItemCreateRequest>, CreateCatalogIemRequestValidator>();
+
 // it will give us a scoped service called IDocumentSession
 // if this was Entity framework, it would give us a "DbContext" object we can use.
 builder.Services.AddScoped<ILookupVendors, VendorLookup>();
