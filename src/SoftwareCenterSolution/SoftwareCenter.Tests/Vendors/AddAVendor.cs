@@ -106,10 +106,22 @@ public  class AddAVendor
         var getResponseBody = await getResponse.ReadAsJsonAsync<CreateVendorResponse>();
 
         Assert.NotNull(getResponseBody);
-
-
         Assert.Equal(postBodyResponse, getResponseBody);
-     
-       
+
+        var newPointOfContactInfo = new CreateVendorPointOfContactRequest
+        {
+            Name = "Thanos",
+            Email = "eyedontfeeltoogood@starkindustries.com",
+            Phone = "800-555-666"
+        };
+
+        var putResponse = await host.Scenario(api =>
+        {
+            api.WithClaim(new Claim(ClaimTypes.Role, "SoftwareCenter"));
+            api.WithClaim(new Claim(ClaimTypes.Role, "Manager"));
+            api.Put.Json(newPointOfContactInfo).ToUrl($"/vendors/{postBodyResponse.Id}/point-of-contact");
+
+            api.StatusCodeShouldBeOk();
+        });
     }
 }

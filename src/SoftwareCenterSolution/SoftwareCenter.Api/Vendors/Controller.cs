@@ -79,6 +79,50 @@ public class Controller(IDocumentSession session) : ControllerBase
         return Ok(vendors);
     }
 
+    [HttpPut("/vendors/{id:guid}/point-of-contact")]
+    [Authorize(Policy = "CanAddVendor")]
+    public async Task<ActionResult> UpdateVendorContactInfo(
+        Guid id,
+        [FromBody] CreateVendorPointOfContactRequest request,
+        [FromServices] IValidator<CreateVendorPointOfContactRequest> validator, 
+        CancellationToken token)
+    {
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+        // look that thing up in the database.
+        var response = await session
+            .Query<CreateVendorResponse>()
+            .Where(v => v.Id == id)
+            .SingleOrDefaultAsync();
+
+        if (response is null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            var updatedVendor = new CreateVendorResponse(
+                id,
+                User.Identity!.Name!,
+                response.Name,
+                response.Url,
+                new CreateVendorPointOfContactRequest
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    Phone = request.Phone,
+                }
+            );
+            session.Store(updatedVendor);
+            await session.SaveChangesAsync();
+            return Ok(updatedVendor);
+        }
+    }
+
 }
 
 /*{
