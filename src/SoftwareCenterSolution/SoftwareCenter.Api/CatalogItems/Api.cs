@@ -1,4 +1,8 @@
-﻿using Marten;
+﻿using FluentValidation;
+using Marten;
+using Microsoft.AspNetCore.Mvc;
+using static SoftwareCenter.Api.CatalogItems.Models;
+using static SoftwareCenter.Api.Vendors.Models;
 
 namespace SoftwareCenter.Api.CatalogItems;
 
@@ -9,7 +13,8 @@ public static class Api
 
         app.MapPost("/vendors/{id:guid}/items", async (
             Guid id, 
-            CatalogItemCreateRequest request, 
+            CatalogItemCreateRequest request,
+            [FromServices] IValidator<CatalogItemCreateRequest> validator,
             IDocumentSession session,
             ILookupVendors vendorLookups) =>
         {
@@ -20,6 +25,13 @@ public static class Api
             {
                 return Results.NotFound();
             }
+
+            var validationResults = await validator.ValidateAsync(request);
+            if (!validationResults.IsValid)
+            {
+                return Results.BadRequest();
+            }
+
             // from CatalogItemCreateRequest -> CatalogItemEntity
             var entity = request.MapToEntity(id);
             // save it to the database (side effect)
@@ -38,59 +50,6 @@ public static class Api
        
         //services.AddScoped
         return services;
-    }
-}
-
-public record CatalogItemCreateRequest
-{
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Version { get; set; } = string.Empty;
-
-    public  CatalogItemEntity MapToEntity(Guid vendorId)
-    {
-        return new CatalogItemEntity
-        {
-
-            Id = Guid.NewGuid(),
-            VendorId = vendorId,
-            Created = DateTimeOffset.UtcNow,
-            Description = Description,
-            Name = Name,
-            Version = Version,
-        };
-    }
-}
-
-public record CatalogItemDetails
-{
-    public Guid Id { get; set; }
-
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Version { get; set; } = string.Empty;
-
-  
-}
-
-public class CatalogItemEntity
-{
-    public Guid Id { get; set; }
-    public Guid VendorId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Version { get; set; } = string.Empty;
-
-    public DateTimeOffset Created { get; set; }
-    public  CatalogItemDetails MapToResponse()
-    {
-        return new CatalogItemDetails
-        {
-            Id = Id,
-            Description =Description,
-            Name = Name,
-            Version = Version,
-        };
     }
 }
 

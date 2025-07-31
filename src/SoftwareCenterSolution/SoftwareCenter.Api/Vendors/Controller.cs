@@ -3,6 +3,7 @@ using FluentValidation;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static SoftwareCenter.Api.Vendors.Models;
 
 namespace SoftwareCenter.Api.Vendors;
 
@@ -51,6 +52,49 @@ public class Controller(IDocumentSession session) : ControllerBase
         return Ok(response);
     }
 
+    [HttpPut("vendors/{id:guid}/point-of-contact")]
+    [Authorize(Policy = "CanAddVendor")]
+    public async Task<ActionResult> UpdateVendorContactAsync(Guid id, 
+        CreateVendorPointOfContactRequest request, 
+        [FromServices] IValidator<CreateVendorPointOfContactRequest> validator, 
+        CancellationToken token)
+    {
+        // data not valid, return 400
+        var validationResults = await validator.ValidateAsync(request);
+        if (!validationResults.IsValid)
+        {
+            return BadRequest(validationResults);
+        }
+
+        // query for vendor
+        var vendor = await session
+            .Query<CreateVendorResponse>()
+            .Where(v => v.Id == id)
+            .SingleOrDefaultAsync();
+
+        // vendor not found, return 404
+        if (vendor is null)
+        {
+            return NotFound();
+        }
+
+        // update point of contact to request
+        var response = new CreateVendorResponse(
+            id,
+            User.Identity!.Name!,
+            vendor.Name,
+            vendor.Url,
+            request
+            );
+
+        // tried a couple ways of doing this^ I feel like there is a better way
+        //vendor.PointOfContact = new CreateVendorPointOfContactRequest(request.Name, request.Phone, request.Email);
+
+        session.Store(vendor);
+        await session.SaveChangesAsync();
+        return Ok(response);
+    }
+
 
     [HttpGet("/vendors/{id:guid}")]
     public async Task<ActionResult> GetVendorByIdAsync(Guid id, CancellationToken token)
@@ -90,45 +134,3 @@ public class Controller(IDocumentSession session) : ControllerBase
         "email": "satya@microsoft.com"
     }
 }*/
-
-
-public record CreateVendorRequest
-{
-
-    public string Name { get; init; } = string.Empty;
-    public string Url { get; init; } = string.Empty;
-    public CreateVendorPointOfContactRequest PointOfContact { get; init; } = new();
-}
-
-public class CreateVendorRequestValidator : AbstractValidator<CreateVendorRequest>
-{
-    public CreateVendorRequestValidator()
-    {
-        RuleFor(v => v.Name).NotEmpty().MinimumLength(3).MaximumLength(255);
-        RuleFor(v => v.Url).NotEmpty();
-        RuleFor(v => v.PointOfContact).NotNull();
-    }
-}
-
-public record CreateVendorPointOfContactRequest
-{
-    public string Name { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Email { get; init; } = string.Empty;
-};
-
-public class CreateVendorPointOfContactRequestValidator :
-    AbstractValidator<CreateVendorPointOfContactRequest>
-{
-    public CreateVendorPointOfContactRequestValidator()
-    {
-        RuleFor(p => p.Name).NotEmpty();
-
-    }
-}
-
-public record CreateVendorResponse(
-    Guid Id,
-    string AddedBy,
-    string Name, string Url, CreateVendorPointOfContactRequest PointOfContact
-    );
