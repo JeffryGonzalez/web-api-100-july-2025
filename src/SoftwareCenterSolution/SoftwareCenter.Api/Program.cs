@@ -15,6 +15,11 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("CanAddVendor", pol =>
     pol.RequireRole("Manager");
     pol.RequireRole("SoftwareCenter");
 });
+builder.Services.AddAuthorizationBuilder().AddPolicy("CanUpdateContactInfo", pol =>
+{
+    pol.RequireRole("Manager");
+    pol.RequireRole("SoftwareCenter");
+});
 
 var connectionString = builder.Configuration.GetConnectionString("db") ??
     throw new Exception("Need a connection string");
