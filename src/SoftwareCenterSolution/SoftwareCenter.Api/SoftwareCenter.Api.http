@@ -33,11 +33,11 @@ GET {{SoftwareCenter.Api_HostAddress}}/info
 
 ###
 
-POST {{SoftwareCenter.Api_HostAddress}}/vendors/c53f4f43-71cd-45bb-9333-2c7cf9afbfaf/items 
+POST {{SoftwareCenter.Api_HostAddress}}/vendors/903e77e0-fec3-4bd5-bfcd-d31a5e95a558/items 
 Content-Type: application/json
 
 {
-    "name": "Word",
+    "name": "Wo",
     "description": "Do words and stuff",
     "version": "2025"
 }

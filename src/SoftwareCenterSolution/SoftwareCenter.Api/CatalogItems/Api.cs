@@ -20,7 +20,11 @@ public static class Api
             var validationResults = await validator.ValidateAsync(request);
             if (!validationResults.IsValid)
             {
-                return Results.BadRequest();
+                {
+                    var errors = validationResults.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+                    return Results.ValidationProblem(errors.ToDictionary(e => e.PropertyName, e => new[] { e.ErrorMessage }));
+                }
+
             }
 
             // validate the stuff - see the issue.
@@ -78,10 +82,18 @@ public class CreateCatalogIemRequestValidator : AbstractValidator<CatalogItemCre
     public CreateCatalogIemRequestValidator()
     {
         RuleFor(v => v.Name)
-            .NotEmpty()
-            .MinimumLength(3).MaximumLength(255);
-        RuleFor(v => v.Description).NotEmpty().MinimumLength(10).MaximumLength(350);
-        RuleFor(v => v.Version).NotNull();
+            .NotEmpty().WithMessage("Name is required.")
+            .MinimumLength(3).WithMessage("Name must be at least 3 characters long.")
+            .MaximumLength(255).WithMessage("Name must not exceed 255 characters.");
+
+        RuleFor(v => v.Description)
+            .NotEmpty().WithMessage("Description is required.")
+            .MinimumLength(10).WithMessage("Description must be at least 10 characters.")
+            .MaximumLength(350).WithMessage("Description must not exceed 350 characters.");
+
+        RuleFor(v => v.Version)
+            .NotEmpty().WithMessage("Version is required.");
+
     }
 }
 
