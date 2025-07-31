@@ -18,4 +18,3 @@ In the root of your `web-api-100` folder, run the following command:
 npx gitpick -o jeffrygonzalez/web-api-100-july-2025 instructor
 ```
 
-
